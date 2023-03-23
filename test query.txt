@@ -1,0 +1,36 @@
+SELECT tb.id_barang, tb.nama_barang, SUM(tp.qty) as qty
+FROM tbl_barang as tb, tbl_penjualan as tp
+WHERE tb.id_barang = tp.id_barang
+AND YEAR(tp.tgl_transaksi) = 2023
+GROUP BY tb.id_barang
+ORDER BY qty desc
+LIMIT 1;
+
+SELECT tk.id_karyawan, tk.nama_karyawan, SUM(tp.qty*tb.harga_barang) as total_harga
+FROM tbl_barang as tb, tbl_penjualan as tp, tbl_karyawan as tk
+WHERE tb.id_barang = tp.id_barang
+AND tk.id_karyawan = tp.id_karyawan
+AND YEAR(tp.tgl_transaksi) = 2023
+GROUP BY tk.id_karyawan
+ORDER BY total_harga desc, tk.nama_karyawan asc
+LIMIT 1;
+
+SELECT YEAR(tp.tgl_transaksi) as tahun, SUM(tp.qty*tb.harga_barang) as total_harga
+FROM tbl_barang as tb, tbl_penjualan as tp
+WHERE tb.id_barang = tp.id_barang
+GROUP BY tahun
+ORDER BY tahun asc;
+
+SELECT tk.id_karyawan, tk.nama_karyawan, (SELECT IFNULL(SUM(tp.qty*tb.harga_barang),0)
+FROM tbl_penjualan as tp, tbl_barang as tb
+WHERE tp.id_barang = tb.id_barang
+AND tp.id_karyawan=tk.id_karyawan) as harga_total
+FROM tbl_karyawan as tk
+ORDER BY id_karyawan asc;
+
+SELECT tbb.id_barang, tbb.nama_barang, (SELECT IFNULL(SUM(tp.qty*tb.harga_barang),0)
+FROM tbl_penjualan as tp, tbl_barang as tb
+WHERE tp.id_barang = tb.id_barang
+AND tp.id_barang=tbb.id_barang) as harga_total
+FROM tbl_barang as tbb
+ORDER BY tbb.id_barang asc;
